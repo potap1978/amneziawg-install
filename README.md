@@ -9,7 +9,7 @@ Supported distributions:
 - AlmaLinux >= 9
 - Debian >= 11
 - Rocky Linux >= 9
-- Ubuntu >= 22.04
+- Ubuntu >= 24.04
 
 others can work but not tested
 
@@ -21,10 +21,10 @@ Before installation it is strictly recommended to upgrade your system to the lat
 
 Use curl or wget to download the script:
 ```bash
-curl -O https://raw.githubusercontent.com/romikb/amneziawg-install/main/amneziawg-install.sh
+curl -O https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install.sh
 ```
 ```bash
-wget https://raw.githubusercontent.com/romikb/amneziawg-install/main/amneziawg-install.sh
+wget https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install.sh
 ```
 
 Set permissions:
