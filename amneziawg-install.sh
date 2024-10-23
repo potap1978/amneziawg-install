@@ -274,8 +274,6 @@ function installAmneziaWG() {
 		fi
 		apt install -y software-properties-common
 		add-apt-repository -y ppa:amnezia/ppa
-  		sed -i 's/noble/plucky noble/' /etc/apt/sources.list.d/amnezia-ubuntu-ppa-noble.sources
-    		apt update
 		apt install -y amneziawg amneziawg-tools qrencode
 	elif [[ ${OS} == 'debian' ]]; then
 		if ! grep -q "^deb-src" /etc/apt/sources.list; then
