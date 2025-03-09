@@ -159,10 +159,10 @@ function installQuestions() {
 	echo ""
 
 	# Detect public IPv4 or IPv6 address and pre-fill for the user
-	SERVER_PUB_IP=$(curl -s ipv4.icanhazip.com)
+	SERVER_PUB_IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
 	if [[ -z ${SERVER_PUB_IP} ]]; then
 		# Detect public IPv6 address
-		SERVER_PUB_IP=$(curl -s ipv6.icanhazip.com)
+		SERVER_PUB_IP=$(ip -6 addr | sed -ne 's|^.* inet6 \([^/]*\)/.* scope global.*$|\1|p' | head -1)
 	fi
 	read -rp "Public IPv4 or IPv6 address or domain: " -e -i "${SERVER_PUB_IP}" SERVER_PUB_IP
 
@@ -613,37 +613,76 @@ function loadParams() {
 	SERVER_AWG_CONF="${AMNEZIAWG_DIR}/${SERVER_AWG_NIC}.conf"
 }
 
+function showClientQR() {
+    NUMBER_OF_CLIENTS=$(grep -c -E "^### Client" "${SERVER_AWG_CONF}")
+    if [[ ${NUMBER_OF_CLIENTS} -eq 0 ]]; then
+        echo ""
+        echo "You have no existing clients!"
+        exit 1
+    fi
+
+    echo ""
+    echo "Select the client to show QR code"
+    grep -E "^### Client" "${SERVER_AWG_CONF}" | cut -d ' ' -f 3 | nl -s ') '
+    until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
+        if [[ ${CLIENT_NUMBER} == '1' ]]; then
+            read -rp "Select one client [1]: " CLIENT_NUMBER
+        else
+            read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
+        fi
+    done
+
+    # match the selected number to a client name
+    CLIENT_NAME=$(grep -E "^### Client" "${SERVER_AWG_CONF}" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
+
+    # Get the home directory for the client
+    HOME_DIR=$(getHomeDirForClient "${CLIENT_NAME}")
+
+    # Check if the client config file exists
+    if [[ -f "${HOME_DIR}/${SERVER_AWG_NIC}-client-${CLIENT_NAME}.conf" ]]; then
+        echo -e "${GREEN}\nHere is your client config file as a QR Code:\n${NC}"
+        qrencode -t ansiutf8 -l L <"${HOME_DIR}/${SERVER_AWG_NIC}-client-${CLIENT_NAME}.conf"
+        echo ""
+    else
+        echo -e "${RED}Client config file not found!${NC}"
+    fi
+}
+
 function manageMenu() {
-	echo "AmneziaWG server installer (https://github.com/romikb/amneziawg-install)"
-	echo ""
-	echo "It looks like AmneziaWG is already installed."
-	echo ""
-	echo "What do you want to do?"
-	echo "   1) Add a new user"
-	echo "   2) List all users"
-	echo "   3) Revoke existing user"
-	echo "   4) Uninstall AmneziaWG"
-	echo "   5) Exit"
-	until [[ ${MENU_OPTION} =~ ^[1-5]$ ]]; do
-		read -rp "Select an option [1-5]: " MENU_OPTION
-	done
-	case "${MENU_OPTION}" in
-	1)
-		newClient
-		;;
-	2)
-		listClients
-		;;
-	3)
-		revokeClient
-		;;
-	4)
-		uninstallAmneziaWG
-		;;
-	5)
-		exit 0
-		;;
-	esac
+    echo "AmneziaWG server installer (https://github.com/romikb/amneziawg-install)"
+    echo ""
+    echo "It looks like AmneziaWG is already installed."
+    echo ""
+    echo "What do you want to do?"
+    echo "   1) Add a new user"
+    echo "   2) List all users"
+    echo "   3) Revoke existing user"
+    echo "   4) Show client QR code"
+    echo "   5) Uninstall AmneziaWG"
+    echo "   6) Exit"
+    until [[ ${MENU_OPTION} =~ ^[1-6]$ ]]; do
+        read -rp "Select an option [1-6]: " MENU_OPTION
+    done
+    case "${MENU_OPTION}" in
+    1)
+        newClient
+        ;;
+    2)
+        listClients
+        ;;
+    3)
+        revokeClient
+        ;;
+    4)
+        showClientQR
+        ;;
+    5)
+        uninstallAmneziaWG
+        ;;
+    6)
+        exit 0
+        ;;
+    esac
 }
 
 # Check for root, virt, OS...
