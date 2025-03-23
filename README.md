@@ -14,6 +14,8 @@ Supported distributions:
 others can work but not tested
 
 2Gb of free space is required for temporary files.
+![image](https://github.com/user-attachments/assets/0d58011d-82c8-410d-a8f2-a58d0a0aa638)
+
 
 ## Usage
 
