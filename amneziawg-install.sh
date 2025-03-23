@@ -648,6 +648,57 @@ function showClientQR() {
     fi
 }
 
+function backupSettings() {
+    echo ""
+    echo "Creating a backup of all AmneziaWG settings..."
+
+    # Create backup directory if it doesn't exist
+    BACKUP_DIR="/etc/amnezia/backups"
+    mkdir -p "${BACKUP_DIR}"
+
+    # Create a timestamped backup file
+    BACKUP_FILE="${BACKUP_DIR}/amneziawg_backup_$(date +%Y%m%d_%H%M%S).tar.gz"
+    tar -czf "${BACKUP_FILE}" -C "${AMNEZIAWG_DIR}" .
+
+    echo -e "${GREEN}Backup created successfully: ${BACKUP_FILE}${NC}"
+}
+
+function restoreSettings() {
+    echo ""
+    echo "Restoring AmneziaWG settings from a backup..."
+
+    BACKUP_DIR="/etc/amnezia/backups"
+    if [[ ! -d "${BACKUP_DIR}" ]]; then
+        echo -e "${RED}No backups found in ${BACKUP_DIR}${NC}"
+        return
+    fi
+
+    # List available backups
+    echo "Available backups:"
+    local backups=($(ls "${BACKUP_DIR}"/*.tar.gz 2>/dev/null))
+    if [[ ${#backups[@]} -eq 0 ]]; then
+        echo -e "${RED}No backups found in ${BACKUP_DIR}${NC}"
+        return
+    fi
+
+    for i in "${!backups[@]}"; do
+        echo "  $((i+1))) ${backups[$i]}"
+    done
+
+    # Prompt user to select a backup
+    until [[ ${BACKUP_INDEX} =~ ^[0-9]+$ && ${BACKUP_INDEX} -ge 1 && ${BACKUP_INDEX} -le ${#backups[@]} ]]; do
+        read -rp "Select a backup to restore [1-${#backups[@]}]: " BACKUP_INDEX
+    done
+
+    SELECTED_BACKUP="${backups[$((BACKUP_INDEX-1))]}"
+
+    # Restore from the selected backup
+    echo "Restoring from ${SELECTED_BACKUP}..."
+    tar -xzf "${SELECTED_BACKUP}" -C "${AMNEZIAWG_DIR}" --overwrite
+
+    echo -e "${GREEN}Settings restored successfully from ${SELECTED_BACKUP}${NC}"
+}
+
 function manageMenu() {
     echo "AmneziaWG server installer (https://github.com/romikb/amneziawg-install)"
     echo ""
@@ -659,9 +710,11 @@ function manageMenu() {
     echo "   3) Revoke existing user"
     echo "   4) Show client QR code"
     echo "   5) Uninstall AmneziaWG"
-    echo "   6) Exit"
-    until [[ ${MENU_OPTION} =~ ^[1-6]$ ]]; do
-        read -rp "Select an option [1-6]: " MENU_OPTION
+    echo "   6) Backup settings"
+    echo "   7) Restore settings"
+    echo "   8) Exit"
+    until [[ ${MENU_OPTION} =~ ^[1-8]$ ]]; do
+        read -rp "Select an option [1-8]: " MENU_OPTION
     done
     case "${MENU_OPTION}" in
     1)
@@ -680,6 +733,12 @@ function manageMenu() {
         uninstallAmneziaWG
         ;;
     6)
+        backupSettings
+        ;;
+    7)
+        restoreSettings
+        ;;
+    8)
         exit 0
         ;;
     esac
