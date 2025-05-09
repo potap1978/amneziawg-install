@@ -211,7 +211,7 @@ function installQuestions() {
 
 	# Keepalive interval
 	until [[ ${KEEPALIVE} =~ ^[0-9]+$ ]] && [ "${KEEPALIVE}" -ge 0 ] && [ "${KEEPALIVE}" -le 65535 ]; do
-		read -rp "Keepalive interval [0-65535]: " -e -i 0 KEEPALIVE
+		read -rp "$(echo -e "${GREEN}Keepalive interval${NC}") [0-65535]: " -e -i 0 KEEPALIVE
 	done
 
 	# Jc
