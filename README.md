@@ -31,7 +31,7 @@ wget https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziaw
 
 For Ubuntu 25.04
 ```bash
-curl -O https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install-Add_SRC_For-Ubuntu_25.04
+curl -O https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install-Add_SRC_For-Ubuntu_25.04.sh
 ```
 ```bash
 wget https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install-Add_SRC_For-Ubuntu_25.04.sh
