@@ -32,12 +32,12 @@ wget https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziaw
 bash <(wget -qO- https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install.sh)
 ```
 
-For Ubuntu 25.04
+For Ubuntu SRC
 ```bash
-curl -O https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install-Add_SRC_For-Ubuntu_25.04.sh
+curl -O https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install-SRC.sh
 ```
 ```bash
-wget https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install-Add_SRC_For-Ubuntu_25.04.sh
+wget https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install-SRC.sh
 ```
 
 Set permissions:
@@ -49,15 +49,15 @@ And execute:
 ./amneziawg-install.sh
 ```
 
--= For Ubuntu 25.04 =-
+-= For Ubuntu SRC =-
 
 Set permissions:
 ```bash
-chmod +x amneziawg-install-Add_SRC_For-Ubuntu_25.04.sh
+chmod +x amneziawg-install-SRC.sh
 ```
 And execute:
 ```bash
-./amneziawg-install-Add_SRC_For-Ubuntu_25.04.sh
+./amneziawg-install-SRC.sh
 ```
 
 Answer the questions asked by the script and it will take care of the rest.
