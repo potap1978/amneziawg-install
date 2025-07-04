@@ -28,6 +28,9 @@ curl -O https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amnez
 ```bash
 wget https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install.sh
 ```
+```bash
+bash <(wget -qO- https://raw.githubusercontent.com/potap1978/amneziawg-install/main/amneziawg-install.sh)
+```
 
 For Ubuntu 25.04
 ```bash
