@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # AmneziaWG server installer
-# https://github.com/potap1978/amneziawg-install
+# https://github.com/potap1978/amneziawg-install-SRC.sh
 
 RED='\033[0;31m'
 ORANGE='\033[0;33m'
@@ -766,7 +766,7 @@ function restoreSettings() {
 }
 
 function manageMenu() {
-    echo "AmneziaWG server installer (https://github.com/potap1978/amneziawg-install)"
+    echo "AmneziaWG server installer (https://github.com/potap1978/amneziawg-install-SRC)"
     echo ""
     echo "It looks like AmneziaWG is already installed."
     echo ""
