@@ -258,41 +258,22 @@ function installQuestions() {
 function setupKernelAndDependencies() {
     echo "=== Настройка репозиториев Yandex Mirror ==="
 
-    # Проверка версии Ubuntu
-    if grep -q "ubuntu" /etc/os-release; then
-        if ! grep -q "plucky" /etc/os-release; then
-            echo "Этот скрипт предназначен только для Ubuntu 25.04 (Plucky)!"
-            exit 1
-        fi
-
-        # Создаем файлы репозиториев
-        cat > /etc/apt/sources.list.d/ubuntu-src.sources << 'EOL'
-Types: deb-src
-URIs: http://mirror.yandex.ru/ubuntu/
-Suites: plucky plucky-updates plucky-backports
-Components: main restricted universe multiverse
-Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-
-Types: deb-src
-URIs: http://mirror.yandex.ru/ubuntu/
-Suites: plucky-security
-Components: main restricted universe multiverse
-Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-EOL
-
-        cat > /etc/apt/sources.list.d/ubuntu.sources << 'EOL'
-Types: deb
-URIs: http://mirror.yandex.ru/ubuntu/
-Suites: plucky plucky-updates plucky-backports
-Components: main restricted universe multiverse
-Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-
-Types: deb
-URIs: http://mirror.yandex.ru/ubuntu/
-Suites: plucky-security
-Components: main restricted universe multiverse
-Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-EOL
+echo "=== Проверка и настройка репозиториев ==="
+# Проверяем существование файла ubuntu.sources
+if [ -f "/etc/apt/sources.list.d/ubuntu.sources" ]; then
+    # Проверяем, не был ли уже создан amneziawg.sources
+    if [ ! -f "/etc/apt/sources.list.d/amneziawg.sources" ]; then
+        echo "Копируем ubuntu.sources в amneziawg.sources..."
+        cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/amneziawg.sources
+        
+        echo "Модифицируем amneziawg.sources (заменяем deb на deb-src)..."
+        sed -i 's/deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources
+    else
+        echo "Файл amneziawg.sources уже существует, пропускаем копирование."
+    fi
+else
+    echo "Файл ubuntu.sources не найден! Продолжаем без копирования."
+fi    
 
         echo "=== Обновление пакетов ==="
         apt update -y
