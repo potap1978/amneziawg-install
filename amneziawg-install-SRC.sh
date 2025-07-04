@@ -576,60 +576,102 @@ function revokeClient() {
 }
 
 function uninstallAmneziaWG() {
-	echo ""
-	echo -e "\n${RED}WARNING: This will uninstall AmneziaWG and remove all the configuration files!${NC}"
-	echo -e "${ORANGE}Please backup the /etc/amnezia/amneziawg directory if you want to keep your configuration files.\n${NC}"
-	read -rp "Do you really want to remove AmneziaWG? [y/n]: " -e REMOVE
-	REMOVE=${REMOVE:-n}
-	if [[ $REMOVE == 'y' ]]; then
-		checkOS
+    echo ""
+    echo -e "\n${RED}WARNING: This will completely uninstall AmneziaWG and remove ALL configuration files!${NC}"
+    echo -e "${ORANGE}Including all server and client configurations!${NC}"
+    echo -e "${ORANGE}Please make sure you have backups if needed.\n${NC}"
+    read -rp "Do you really want to completely remove AmneziaWG? [y/n]: " -e REMOVE
+    REMOVE=${REMOVE:-n}
+    if [[ $REMOVE == 'y' ]]; then
+        checkOS
 
-		systemctl stop "awg-quick@${SERVER_AWG_NIC}"
-		systemctl disable "awg-quick@${SERVER_AWG_NIC}"
+        # Stop and disable service
+        echo "Stopping AmneziaWG service..."
+        systemctl stop "awg-quick@${SERVER_AWG_NIC}" 2>/dev/null
+        systemctl disable "awg-quick@${SERVER_AWG_NIC}" 2>/dev/null
 
-		# Disable routing
-		rm -f /etc/sysctl.d/awg.conf
-		sysctl --system
+        # Disable routing
+        echo "Removing sysctl settings..."
+        rm -f /etc/sysctl.d/awg.conf 2>/dev/null
+        sysctl --system 2>/dev/null
 
-		# Remove config files
-		rm -rf ${AMNEZIAWG_DIR}/*
+        # Remove all client configs
+        echo "Removing client configurations..."
+        if [ -f "${SERVER_AWG_CONF}" ]; then
+            # Extract all client names from config
+            CLIENTS=$(grep -E "^### Client" "${SERVER_AWG_CONF}" | cut -d ' ' -f 3)
+            
+            # Remove each client config file
+            for CLIENT in $CLIENTS; do
+                HOME_DIR=$(getHomeDirForClient "${CLIENT}")
+                CLIENT_FILE="${HOME_DIR}/${SERVER_AWG_NIC}-client-${CLIENT}.conf"
+                if [ -f "${CLIENT_FILE}" ]; then
+                    echo "Removing client config: ${CLIENT_FILE}"
+                    rm -f "${CLIENT_FILE}"
+                fi
+            done
+        fi
 
-		if [[ ${OS} == 'ubuntu' ]]; then
-			apt remove -y amneziawg amneziawg-tools
-			add-apt-repository -ry ppa:amnezia/ppa
-			if [[ -e /etc/apt/sources.list.d/ubuntu.sources ]]; then
-				rm -f /etc/apt/sources.list.d/amneziawg.sources
-			else
-				rm -f /etc/apt/sources.list.d/amneziawg.sources.list
-			fi
-		elif [[ ${OS} == 'debian' ]]; then
-			apt-get remove -y amneziawg amneziawg-tools
-			rm -f /etc/apt/sources.list.d/amneziawg.sources.list
-			apt-key del 57290828
-			apt update
-		elif [[ ${OS} == 'fedora' ]]; then
-			dnf remove -y amneziawg-dkms amneziawg-tools
-			dnf copr disable -y amneziavpn/amneziawg
-		elif [[ ${OS} == 'centos' ]] || [[ ${OS} == 'almalinux' ]] || [[ ${OS} == 'rocky' ]]; then
-			dnf remove -y amneziawg-dkms amneziawg-tools
-			dnf copr disable -y amneziavpn/amneziawg
-		fi
+        # Remove server config files
+        echo "Removing server configurations..."
+        rm -rf "${AMNEZIAWG_DIR}"/* 2>/dev/null
 
-		# Check if AmneziaWG is running
-		systemctl is-active --quiet "awg-quick@${SERVER_AWG_NIC}"
-		AWG_RUNNING=$?
+        # Remove binaries
+        echo "Removing binaries..."
+        rm -f /usr/bin/awg 2>/dev/null
+        rm -f /usr/bin/awg-quick 2>/dev/null
+        rm -f /usr/local/bin/awg 2>/dev/null
+        rm -f /usr/local/bin/awg-quick 2>/dev/null
 
-		if [[ ${AWG_RUNNING} -eq 0 ]]; then
-			echo "AmneziaWG failed to uninstall properly."
-			exit 1
-		else
-			echo "AmneziaWG uninstalled successfully."
-			exit 0
-		fi
-	else
-		echo ""
-		echo "Removal aborted!"
-	fi
+        # Remove compiled files and sources
+        echo "Cleaning up source files..."
+        dkms remove -m amneziawg -v 1.0.0 --all 2>/dev/null
+        rm -rf /usr/src/amneziawg-1.0.0 2>/dev/null
+        rm -rf ~/awg-src 2>/dev/null
+
+        # Remove packages and repository
+        echo "Removing packages..."
+        apt-get remove --purge -y amneziawg amneziawg-tools 2>/dev/null
+        apt-get autoremove -y 2>/dev/null
+        
+        # Remove repository
+        echo "Cleaning up repositories..."
+        if [[ -e /etc/apt/sources.list.d/ubuntu.sources ]]; then
+            rm -f /etc/apt/sources.list.d/amneziawg.sources 2>/dev/null
+        else
+            rm -f /etc/apt/sources.list.d/amneziawg.list 2>/dev/null
+        fi
+        
+        # Update packages
+        apt-get update -y 2>/dev/null
+
+        # Final verification
+        echo ""
+        echo -e "${GREEN}Uninstallation complete. Performing final checks...${NC}"
+        
+        REMNANTS=0
+        if [ -f "/usr/bin/awg" ] || [ -f "/usr/bin/awg-quick" ] || \
+           [ -f "/usr/local/bin/awg" ] || [ -f "/usr/local/bin/awg-quick" ]; then
+            echo -e "${ORANGE}Warning: Some binaries were not removed${NC}"
+            REMNANTS=1
+        fi
+        
+        if systemctl is-active --quiet "awg-quick@${SERVER_AWG_NIC}" 2>/dev/null; then
+            echo -e "${ORANGE}Warning: Service still appears to be running${NC}"
+            REMNANTS=1
+        fi
+        
+        if [ "$REMNANTS" -eq 0 ]; then
+            echo -e "${GREEN}AmneziaWG has been completely removed from your system.${NC}"
+            exit 0
+        else
+            echo -e "${ORANGE}Some components might remain. You may need to remove them manually.${NC}"
+            exit 1
+        fi
+    else
+        echo ""
+        echo "Uninstallation cancelled."
+    fi
 }
 
 function loadParams() {
