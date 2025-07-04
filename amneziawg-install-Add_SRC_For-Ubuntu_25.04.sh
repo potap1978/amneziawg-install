@@ -322,7 +322,7 @@ EOL
 
         echo "=== Сборка amneziawg-tools ==="
         cd ~/awg-src || exit
-        git clone https://github.com/amnezia-vpn/amneziawg-tools.git
+        git clone --branch v1.0.20241018 --depth 1 https://github.com/amnezia-vpn/amneziawg-tools.git
         cd amneziawg-tools/src/ || exit
         make
         make install
