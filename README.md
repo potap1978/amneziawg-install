@@ -9,7 +9,7 @@ Supported distributions:
 - AlmaLinux >= 9
 - Debian >= 11
 - Rocky Linux >= 9
-- Ubuntu >= 24.04 - 25.04
+- Ubuntu >= 24.04 - 25.04-src
 
 others can work but not tested
 
