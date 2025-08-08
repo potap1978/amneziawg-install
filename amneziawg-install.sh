@@ -282,8 +282,8 @@ function installAmneziaWG() {
 		fi
 		if ! command -v gpg &> /dev/null; then apt install -y gnupg; fi  
 		apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 57290828
-		echo "deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >>/etc/apt/sources.list.d/amneziawg.sources.list
-		echo "deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >>/etc/apt/sources.list.d/amneziawg.sources.list
+		echo "deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu noble main" >>/etc/apt/sources.list.d/amneziawg.sources.list
+		echo "deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu noble main" >>/etc/apt/sources.list.d/amneziawg.sources.list
 		apt update
 		apt install -y amneziawg amneziawg-tools qrencode iptables
 	elif [[ ${OS} == 'fedora' ]]; then
