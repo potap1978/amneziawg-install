@@ -296,6 +296,7 @@ cd ~/awg-src || exit
 echo "Клонируем amneziawg-linux-kernel-module..."
 git clone https://github.com/amnezia-vpn/amneziawg-linux-kernel-module.git
 
+# с 10.10.2025 это ненужно
 ## echo "Ищем и скачиваем исходники ядра..."
 ##KERNEL_VERSION=$(apt-cache search linux-source | grep -oP 'linux-source-\K\d+\.\d+\.\d+' | head -1)
 ##if [ -z "$KERNEL_VERSION" ]; then
