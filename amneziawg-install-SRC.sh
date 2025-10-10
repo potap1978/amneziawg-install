@@ -296,16 +296,16 @@ cd ~/awg-src || exit
 echo "Клонируем amneziawg-linux-kernel-module..."
 git clone https://github.com/amnezia-vpn/amneziawg-linux-kernel-module.git
 
-echo "Ищем и скачиваем исходники ядра..."
-KERNEL_VERSION=$(apt-cache search linux-source | grep -oP 'linux-source-\K\d+\.\d+\.\d+' | head -1)
-if [ -z "$KERNEL_VERSION" ]; then
-    echo "Не удалось определить версию linux-source. Выход."
-    exit 1
-fi
-echo "Найдена версия ядра: $KERNEL_VERSION"
-apt-get source -y linux-source-$KERNEL_VERSION
-
-echo "=== Сборка модуля ядра ==="
+## echo "Ищем и скачиваем исходники ядра..."
+##KERNEL_VERSION=$(apt-cache search linux-source | grep -oP 'linux-source-\K\d+\.\d+\.\d+' | head -1)
+##if [ -z "$KERNEL_VERSION" ]; then
+##    echo "Не удалось определить версию linux-source. Выход."
+##    exit 1
+##fi
+##echo "Найдена версия ядра: $KERNEL_VERSION"
+##apt-get source -y linux-source-$KERNEL_VERSION
+##
+##echo "=== Сборка модуля ядра ==="
 cd ~/awg-src/amneziawg-linux-kernel-module/src/ || exit
 
 # с 10.10.2025 это ненужно 
