@@ -307,7 +307,9 @@ apt-get source -y linux-source-$KERNEL_VERSION
 
 echo "=== Сборка модуля ядра ==="
 cd ~/awg-src/amneziawg-linux-kernel-module/src/ || exit
-ln -s ~/awg-src/linux-$KERNEL_VERSION kernel
+
+# с 10.10.2025 это ненужно 
+#ln -s ~/awg-src/linux-$KERNEL_VERSION kernel
 
 make dkms-install
 dkms add -m amneziawg -v 1.0.0
