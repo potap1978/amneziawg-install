@@ -736,6 +736,8 @@ function backupSettings() {
 
 function restoreSettings() {
     echo ""
+	echo "Положи ФАЙЛ БЭКАПА в /etc/amnezia/backups/"
+	echo ""
     echo "Restoring AmneziaWG settings from a backup..."
 
     BACKUP_DIR="/etc/amnezia/backups"
